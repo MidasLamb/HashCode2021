@@ -42,17 +42,59 @@ pub struct Solution {
 pub fn solve(mut problem: Problem) -> Solution {
     let mut traffic_lights = HashMap::<u32, Vec<(String, u32)>>::new();
 
-    let single_intersections = problem
+    // Single intersection
+    problem
         .intersections
         .iter_mut()
-        .enumerate()
-        .filter(|(_, intersection)| intersection.incoming_streets.len() == 1)
-        .for_each(|(u, i)| {
+        .filter(|intersection| intersection.incoming_streets.len() == 1)
+        .for_each(|i| {
             traffic_lights.insert(
-                u as u32,
+                i.id,
                 vec![(i.incoming_streets[0].borrow_mut().name.clone(), 1 as u32)],
             );
         });
+
+    // Remove single intersections
+    problem.intersections = problem
+        .intersections
+        .into_iter()
+        .filter(|intersection| intersection.incoming_streets.len() > 1)
+        .collect::<Vec<_>>();
+
+    let mut count_map = HashMap::<String, u64>::new();
+    problem.cars.iter().for_each(|c| {
+        c.borrow_mut().path_to_take.iter().for_each(|s| {
+            match count_map.get_mut(&s.borrow().name.clone()) {
+                Some(v) => *v += 1,
+                None => {
+                    count_map.insert(s.borrow().name.clone(), 1);
+                }
+            };
+        })
+    });
+
+    problem.intersections.iter_mut().for_each(|mut i| {
+        i.incoming_streets = i
+            .incoming_streets
+            .iter()
+            .filter(|s| count_map.get(&s.borrow_mut().name.clone()).is_some())
+            .map(|x| x.clone())
+            .collect();
+    });
+
+    if false {
+        problem.intersections.iter_mut().for_each(|i| {
+            traffic_lights.insert(
+                i.id,
+                i.incoming_streets
+                    .iter()
+                    .map(|is| (is.borrow_mut().name.clone(), 1 as u32))
+                    .collect::<Vec<_>>(),
+            );
+        });
+    }
+
+    if true {}
 
     Solution { traffic_lights }
 }
