@@ -5,6 +5,7 @@ name = "hash-code-2021"
 version = "0.1.0"
 
 [lib]
+metaheuristics = "1.0"
 name = "hash_code_2021"
 
 [[bin]]
@@ -12,6 +13,7 @@ name = "hash_code_2021_cli"
 path = "src/main.rs"
 
 [dependencies]
+metaheuristics = "1"
 structopt = "0.3"
 walkdir = "2"
 
