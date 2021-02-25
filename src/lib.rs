@@ -84,17 +84,40 @@ pub fn solve(mut problem: Problem) -> Solution {
 
     if false {
         problem.intersections.iter_mut().for_each(|i| {
-            traffic_lights.insert(
-                i.id,
-                i.incoming_streets
-                    .iter()
-                    .map(|is| (is.borrow_mut().name.clone(), 1 as u32))
-                    .collect::<Vec<_>>(),
-            );
+            if i.incoming_streets.len() > 0 {
+                traffic_lights.insert(
+                    i.id,
+                    i.incoming_streets
+                        .iter()
+                        .map(|is| (is.borrow_mut().name.clone(), 1 as u32))
+                        .collect::<Vec<_>>(),
+                );
+            }
+        });
+    } else {
+        problem.intersections.iter_mut().for_each(|i| {
+            if i.incoming_streets.len() > 0 {
+                traffic_lights.insert(
+                    i.id,
+                    i.incoming_streets
+                        .iter()
+                        .map(|is| {
+                            (
+                                is.borrow().name.clone(),
+                                (count_map.get(&is.borrow().name.clone()).unwrap()
+                                    / (i.incoming_streets
+                                        .iter()
+                                        .map(|is| count_map.get(&is.borrow().name.clone()).unwrap())
+                                        .sum::<u64>()
+                                        / i.incoming_streets.len() as u64)
+                                    + 1) as u32,
+                            )
+                        })
+                        .collect::<Vec<_>>(),
+                );
+            }
         });
     }
-
-    if true {}
 
     Solution { traffic_lights }
 }
